@@ -86,7 +86,7 @@ const ProviderDetail: React.FC = () => {
                 description: 'Ocorreu um erro ao enviar o e-mail. Tente novamente.'
             });
         }
-    }, [provider, setSendEmail, addToast]);
+    }, [setSendEmail, addToast]);
 
     return (
         <ContentPage header={<GoBack path='/providers' />} optionText='DETALHE DO FORNECEDOR'>
