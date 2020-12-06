@@ -44,7 +44,7 @@ const Providers: React.FC = () => {
     useEffect(() => {
         async function loadProviders(): Promise<void> {
             const response: AxiosResponse<IProvidersProps[]> = await api.get('/users?type=1');
-
+            console.log('oi');
             setProviders(response.data);
         }
 
