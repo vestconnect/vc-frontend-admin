@@ -156,7 +156,7 @@ const Providers: React.FC = () => {
 
                     {providers.length ?
                         providers.map(provider => <ProviderItem key={provider.id} item={provider} />)
-                        : providersLoaded ? <span>Carregando...</span> : <span>Nenhum fornecedor</span>
+                        : !providersLoaded ? <span>Carregando...</span> : <span>Nenhum fornecedor</span>
                     }
                 </>
             }
