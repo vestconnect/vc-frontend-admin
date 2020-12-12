@@ -34,6 +34,7 @@ interface INewProviderProps {
 
 const Providers: React.FC = () => {
     const [providers, setProviders] = useState<IProvidersProps[]>([]);
+    const [providersLoaded, setProvidersLoaded] = useState(false);
     const [newProvider, setNewProvider] = useState(false);
     const [avatar, setAvatar] = useState('');
     const formRef = useRef<FormHandles>(null);
@@ -44,8 +45,9 @@ const Providers: React.FC = () => {
     useEffect(() => {
         async function loadProviders(): Promise<void> {
             const response: AxiosResponse<IProvidersProps[]> = await api.get('/users?type=1');
-            
+
             setProviders(response.data);
+            setProvidersLoaded(true);
         }
 
         loadProviders();
@@ -154,12 +156,11 @@ const Providers: React.FC = () => {
 
                     {providers.length ?
                         providers.map(provider => <ProviderItem key={provider.id} item={provider} />)
-                        :
-                        <span>Carregando...</span>
+                        : providersLoaded ? <span>Carregando...</span> : <span>Nenhum fornecedor</span>
                     }
                 </>
             }
-        </ContentPage >
+        </ContentPage>
     );
 };
 
