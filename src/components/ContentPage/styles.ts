@@ -16,8 +16,8 @@ export const ContainerContentPage = styled.div`
 
     flex: 1;
 
-    max-width: 750px;
-    height: 400px;
+    max-width: 1366px;
+    height: 768px;
 
     background-color: #000;
     box-shadow: 0px 0px 20px #F2f2f2;
@@ -33,7 +33,7 @@ export const Content = styled.div`
     padding: 35px 20px;
     
     width: 100%;
-    max-width: 375px;
+    max-width: 683px;
     overflow-y: scroll;
 
     &::-webkit-scrollbar {
@@ -59,7 +59,7 @@ export const Background = styled.div`
     align-items: center;
     justify-content: center;
     display: flex;
-    max-width: 375px;
+    max-width: 683px;
 
     
     @media (max-width: 600px) {
