@@ -3,7 +3,6 @@ import { Switch } from 'react-router-dom';
 
 import Route from './Route';
 import Login from '../pages/Login';
-import Dashboard from '../pages/Dashboard';
 import Providers from '../pages/Providers';
 import ProviderDetail from '../pages/ProviderDetail';
 import ProviderProducts from '../pages/ProviderProducts';
@@ -26,7 +25,6 @@ const Routes: React.FC = () => {
             <Route path="/users" exact component={Users} isPrivate={true} />
             <Route path="/administrators" exact component={Administrators} isPrivate={true} />
             <Route path="/settings" exact component={Settings} isPrivate={true} />
-            <Route path="/dashboard" exact component={Dashboard} isPrivate={true} />
             <Route path="/providers" exact component={Providers} isPrivate={true} />
             <Route path="/provider/detail/:id" exact component={ProviderDetail} isPrivate={true} />
             <Route path="/provider/products/:id" exact component={ProviderProducts} isPrivate={true} />
