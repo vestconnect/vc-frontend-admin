@@ -30,7 +30,21 @@ export function useAuth(): AuthContextState {
 }
 
 export const AuthProvider: React.FC = ({ children }) => {
-    const [data, setData] = useState<AuthState>({} as AuthState);
+    const [data, setData] = useState<AuthState>(() => {
+        const token = localStorage.getItem('@VestConnectAdmin:token');
+        const user = localStorage.getItem('@VestConnectAdmin:user');
+
+        if (token && user) {
+            api.defaults.headers['Authorization'] = `Bearer ${token}`;
+
+            return {
+                token,
+                user: JSON.parse(user)
+            }
+        }
+
+        return {} as AuthState;
+    });
 
     const signIn = useCallback(async ({ email, password }) => {
         const response = await api.post('/sessions', {

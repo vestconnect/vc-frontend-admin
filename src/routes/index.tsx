@@ -11,11 +11,21 @@ import UserProducts from '../pages/UsersProducts';
 import Contents from '../pages/Contents';
 import ContentPhotos from '../pages/ContentPhotos';
 import ContentVideos from '../pages/ContentVideos';
+import Home from '../pages/Home';
+import Users from '../pages/Users';
+import Administrators from '../pages/Administrators';
+import Settings from '../pages/Settings';
+import Forgot from '../pages/Forgot';
 
 const Routes: React.FC = () => {
     return (
         <Switch>
             <Route path="/" exact component={Login} />
+            <Route path="/forgot" exact component={Forgot} />
+            <Route path="/home" exact component={Home} isPrivate={true} />
+            <Route path="/users" exact component={Users} isPrivate={true} />
+            <Route path="/administrators" exact component={Administrators} isPrivate={true} />
+            <Route path="/settings" exact component={Settings} isPrivate={true} />
             <Route path="/dashboard" exact component={Dashboard} isPrivate={true} />
             <Route path="/providers" exact component={Providers} isPrivate={true} />
             <Route path="/provider/detail/:id" exact component={ProviderDetail} isPrivate={true} />

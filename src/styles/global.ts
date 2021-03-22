@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 export default createGlobalStyle`
     * {
@@ -15,15 +15,15 @@ export default createGlobalStyle`
     }
 
     body, input, button {
-        font-family: 'Roboto slab', serif;
+        font-family: 'Roboto', serif;
         font-size: 16px;
     }
 
-    h1, h2, h3, h4, h5, h6, strong, p, span {
-        font-family: 'Roboto slab', serif;
+    h1, h2, h3, h4, h5, h6, strong, p, span, a {
+        font-family: 'Roboto', serif;
     }
 
     button {
         cursor: pointer;
     }
-`
+`;

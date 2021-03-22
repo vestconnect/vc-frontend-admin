@@ -1,167 +1,214 @@
-import { AxiosResponse } from 'axios';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FiImage, FiPlusCircle } from 'react-icons/fi';
-import { Form } from '@unform/web';
-import { FormHandles } from '@unform/core';
-import getValidationErrors from '../../utils/getValidationErrors';
-import Input from '../../components/Input';
-import ContentPage from '../../components/ContentPage';
-import GoBack from '../../components/GoBack';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import Page from '../../components/Page';
+import {
+  FiMail,
+  FiUser,
+  FiStar,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiEdit,
+  FiShoppingBag
+} from 'react-icons/fi';
+import Table from '../../components/Table';
+import Pagination from '../../components/Pagination';
+import Loading from '../../components/Loading';
 import Button from '../../components/Button';
-import ProviderItem from '../../components/ProviderItem';
+import RegisterProvider from './Register';
+import EditProvider from './Edit';
 import api from '../../services/api';
+import noRecords from '../../assets/icons/noRecords.png';
 import { useToast } from '../../hooks/toast';
-import * as Yup from 'yup';
-
-import { ContainerAvatar, InputFile, Avatar } from './styles';
+import { AxiosResponse } from 'axios';
+import {
+  AvatarColumnTh,
+  NameColumnTh,
+  EmailColumnTh,
+  NickNameColumnTh,
+  ActionColumnTh,
+  AvatarColumnTd,
+  NameColumnTd,
+  EmailColumnTd,
+  NickNameColumnTd,
+  ActionColumnTd,
+  TableButton,
+  ContainerLoading,
+  ButtonProvider,
+  ActiveColumnTd,
+  ActiveColumnTh,
+  Avatar
+} from './styles';
 
 interface IProvidersProps {
-    id: string;
-    name: string;
-    email: string;
-    nickname: string;
-    avatar_url: string;
+  id: string;
+  name: string;
+  email: string;
+  nickname: string;
+  avatar_url: string;
+  active: boolean;
 }
 
-interface INewProviderProps {
-    name: string;
-    email: string;
-    password: string;
-    nickname: string;
-    birth: string;
-    type: string;
+interface IReturnProviders {
+  users: IProvidersProps[];
+  total: number;
+  total_pages: number;
 }
 
 const Providers: React.FC = () => {
-    const [providers, setProviders] = useState<IProvidersProps[]>([]);
-    const [providersLoaded, setProvidersLoaded] = useState(false);
-    const [newProvider, setNewProvider] = useState(false);
-    const [avatar, setAvatar] = useState('');
-    const formRef = useRef<FormHandles>(null);
-    const inputAvatarRef = useRef<HTMLInputElement>(null);
-    const { addToast } = useToast();
-    const [saveProvider, setSaveProvider] = useState(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [providers, setProviders] = useState<IProvidersProps[]>([]);
+  const [currentProvider, setCurrentProvider] = useState<IProvidersProps>({} as IProvidersProps);
+  const [registerProvider, setRegisterProvider] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const history = useHistory();
 
-    useEffect(() => {
-        async function loadProviders(): Promise<void> {
-            const response: AxiosResponse<IProvidersProps[]> = await api.get('/users?type=1');
+  const { addToast } = useToast();
 
-            setProviders(response.data);
-            setProvidersLoaded(true);
-        }
+  const loadProviders = useCallback(async (page: number) => {
+    const response: AxiosResponse<IReturnProviders> = await api.get(`/users/providers?page=${page}`);
 
-        loadProviders();
-    }, []);
+    setProviders(response.data.users);
+    setTotalPages(response.data.total_pages);
 
-    const handleSubmit = useCallback(async (data: INewProviderProps) => {
-        try {
-            formRef.current?.setErrors({});
+    setLoading(false);
+  }, []);
 
-            const schema = Yup.object().shape({
-                name: Yup.string().required('Nome obrigatório'),
-                email: Yup.string().required('E-mail obrigatório'),
-                password: Yup.string().min(6).required('Password obrigatório'),
-                nickname: Yup.string().required('Nickname obrigatório')
-            });
+  useEffect(() => {
+    loadProviders(currentPage);
+  }, [loadProviders, currentPage]);
 
-            await schema.validate(data, {
-                abortEarly: false
-            });
+  const handleShowProvider = useCallback((provider: IProvidersProps) => {
+    setOpenModal(true);
+    setCurrentProvider(provider);
+  }, []);
 
-            setSaveProvider(true);
+  const handleInactiveProvider = async (id: string) => {
+    try {
+      await api.patch(`users/${id}/active`);
 
-            data.birth = '01/01/2020';
-            data.type = '1';
+      const indexListProvider = providers.findIndex(provider => {
+        return provider.id === id;
+      });
 
-            let response: AxiosResponse<IProvidersProps> = await api.post('/users', data);
+      if (indexListProvider !== -1) {
+        providers[indexListProvider] = { ...providers[indexListProvider], active: !providers[indexListProvider].active }
 
-            if (inputAvatarRef.current?.files?.length) {
-                const avatarData = new FormData();
-                avatarData.append('avatar', inputAvatarRef.current.files[0]);
-                response = await api.patch(`/users/${response.data.id}/avatar`, avatarData);
-            }
+        setProviders([...providers]);
+      }
 
-            addToast({
-                type: 'success',
-                title: 'Fornecedor inserido',
-                description: 'Seu fornecedor foi inserido com sucesso.'
-            });
+      addToast({
+        title: 'Alteração feita',
+        description: 'A alteração foi feita com sucesso',
+        type: 'success'
+      });
+    } catch (e) {
+      addToast({
+        title: 'Alteração não concluída',
+        description: 'A alteração não foi concluída. Tente novamente',
+        type: 'error'
+      });
+    }
+  }
 
-            setSaveProvider(false);
+  const handleFinishRegister = useCallback(async () => {
+    await loadProviders(currentPage);
+    setRegisterProvider(false);
+  }, [loadProviders, currentPage]);
 
-            setProviders([...providers, response.data]);
+  const handleCloseModal = useCallback(async () => {
+    setOpenModal(false);
+  }, []);
 
-            setNewProvider(false);
-        } catch (e) {
-            setSaveProvider(false);
+  const handleSaveModal = useCallback(async () => {
+    setLoading(true);
+    setOpenModal(false);
+    await loadProviders(currentPage);
+  }, [loadProviders, currentPage]);
 
-            if (e instanceof Yup.ValidationError) {
-                const errors = getValidationErrors(e);
+  return (
+    <Page header={`${registerProvider ? 'CADASTRO DE FORNECEDOR' : 'FORNECEDORES'}`}>
+      {registerProvider ?
+        <RegisterProvider
+          onFinishRegister={handleFinishRegister}
+          onCancelRegister={() => setRegisterProvider(false)}
+        />
+        : loading ?
+          <ContainerLoading>
+            <Loading color="white" />
+            <span>Carregando seus fornecedores...</span>
+          </ContainerLoading>
+          : !providers.length ?
+            <ContainerLoading>
+              <img src={noRecords} alt="No records" width={60} height={60} style={{ marginBottom: 10 }} />
+              <span style={{ marginBottom: 0 }}>Nenhum fornecedor encontrado.<br />Que tal cadastrar seu primeiro fornecedor?</span>
 
-                formRef.current?.setErrors(errors);
+              <ButtonProvider onClick={() => { setRegisterProvider(true) }}>Cadastrar fornecedor</ButtonProvider>
+            </ContainerLoading>
+            :
+            <>
+              <EditProvider
+                openModal={openModal}
+                currentProvider={currentProvider}
+                onCloseModal={handleCloseModal}
+                onSaveModal={handleSaveModal}
+              />
+              <Button style={{ maxWidth: 200 }} onClick={() => { setRegisterProvider(true) }}>Cadastrar fornecedor</Button>
+              <Table>
+                <thead>
+                  <tr>
+                    <AvatarColumnTh></AvatarColumnTh>
+                    <NameColumnTh>Nome</NameColumnTh>
+                    <EmailColumnTh>E-mail</EmailColumnTh>
+                    <NickNameColumnTh>Apelido</NickNameColumnTh>
+                    <ActiveColumnTh>Status</ActiveColumnTh>
+                    <ActionColumnTh>Ações</ActionColumnTh>
+                  </tr>
+                </thead>
+                <tbody>
+                  {providers.map(provider => {
+                    return (
+                      <tr key={provider.id}>
+                        <AvatarColumnTd><Avatar src={provider.avatar_url} /></AvatarColumnTd>
+                        <NameColumnTd><div><FiUser size={20} />{provider.name}</div></NameColumnTd>
+                        <EmailColumnTd><div><FiMail size={20} />{provider.email}</div></EmailColumnTd>
+                        <NickNameColumnTd><div><FiStar color="yellow" size={20} />{provider.nickname}</div></NickNameColumnTd>
+                        <ActiveColumnTd><div>{provider.active ? <FiCheckCircle color="#00CC00" size={20} /> : <FiAlertCircle color="#DF4401" size={20} />}{provider.active ? 'Ativo' : 'Inativo'}</div></ActiveColumnTd>
+                        <ActionColumnTd>
+                          <div>
+                            <TableButton onClick={() => handleShowProvider(provider)}>
+                              <FiEdit size={15} color="#FFF" /> Editar
+                            </TableButton>
+                            <TableButton
+                              isInactive={true}
+                              onClick={() => {
+                                handleInactiveProvider(provider.id)
+                              }}
+                            >
+                              {provider.active
+                                ? <FiAlertCircle color="yellow" size={15} />
+                                : <FiCheckCircle color="#00CC00" size={15} />}
+                              {provider.active
+                                ? 'Inativar'
+                                : 'Ativar'}
+                            </TableButton>
+                            <TableButton onClick={() => history.push(`/provider/products/${provider.id}`)}>
+                              <FiShoppingBag size={15} color="#FFF" /> Produtos
+                            </TableButton>
+                          </div>
 
-                return;
-            }
-
-            addToast({
-                type: 'error',
-                title: 'Erro ao inserir fornecedor',
-                description: 'Ocorreu um erro ao inserir seu fornecedor. Tente novamente.'
-            });
-        }
-    }, [addToast, setSaveProvider, providers, setProviders, setNewProvider]);
-
-    const handleChangeAvatar = useCallback(() => {
-        if (inputAvatarRef.current?.files) {
-            var reader = new FileReader();
-
-            reader.onload = function (e: any) {
-                setAvatar(e.target.result);
-            }
-
-            reader.readAsDataURL(inputAvatarRef.current.files[0]);
-        }
-    }, [setAvatar]);
-
-    return (
-        <ContentPage header={<GoBack path="/dashboard" />} optionText="FORNECEDORES">
-            {newProvider ?
-                <>
-                    <Button onClick={() => { setNewProvider(false) }}>Cancelar cadastro</Button>
-
-                    <ContainerAvatar>
-                        {avatar ? <Avatar src={avatar} /> : <FiImage size={45} />}
-                        <InputFile
-                            ref={inputAvatarRef}
-                            type="file"
-                            id="avatar"
-                            name="avatar"
-                            onChange={handleChangeAvatar}
-                        />
-                        <label htmlFor="avatar"><FiPlusCircle size={15} color='#FFFFFF' /></label>
-                    </ContainerAvatar>
-
-                    <Form ref={formRef} onSubmit={handleSubmit}>
-                        <Input name="name" title="Nome" />
-                        <Input name="email" title="E-mail" />
-                        <Input name="password" type="password" title="Password" />
-                        <Input name="nickname" title="Nickname" />
-
-                        <Button type="submit" disabled={saveProvider ? true : false}>{saveProvider ? 'Salvando fornecedor' : 'Cadastrar fornecedor'}</Button>
-                    </Form>
-                </>
-                :
-                <>
-                    <Button onClick={() => { setNewProvider(true) }}>Novo fornecedor</Button>
-
-                    {providers.length ?
-                        providers.map(provider => <ProviderItem key={provider.id} item={provider} />)
-                        : !providersLoaded ? <span>Carregando...</span> : <span>Nenhum fornecedor</span>
-                    }
-                </>
-            }
-        </ContentPage>
-    );
-};
+                        </ActionColumnTd>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </Table>
+              <Pagination totalPages={totalPages} setCurrentPage={setCurrentPage} />
+            </>
+      }
+    </Page>
+  );
+}
 
 export default Providers;

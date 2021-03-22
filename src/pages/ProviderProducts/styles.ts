@@ -1,14 +1,4 @@
-import styled, { css } from 'styled-components';
-import Button from '../../components/Button';
-
-interface ITableButtonProps {
-  isInactive?: boolean;
-}
-
-export const ButtonProvider = styled(Button)`
-  max-width: 250px;
-  margin-top: 10px;
-`;
+import styled from 'styled-components';
 
 export const Avatar = styled.img`
     width: 80px;
@@ -19,16 +9,16 @@ export const Avatar = styled.img`
 `;
 
 export const AvatarColumnTh = styled.th`
-  width: 10%!important;
-  text-align: center;
+  width: 5%!important;
+  text-align: left;
 
   @media(max-width: 414px) {
     display: none;
   }
 `;
 
-export const NameColumnTh = styled.th`
-  width: 25%!important;
+export const TitleColumnTh = styled.th`
+  width: 20%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -37,8 +27,8 @@ export const NameColumnTh = styled.th`
   }
 `;
 
-export const EmailColumnTh = styled.th`
-  width: 20%!important;
+export const SubtitleColumnTh = styled.th`
+  width: 25%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -46,7 +36,7 @@ export const EmailColumnTh = styled.th`
   }
 `;
 
-export const ActiveColumnTh = styled.th`
+export const NfcColumnTh = styled.th`
   width: 10%!important;
   text-align: left;
 
@@ -55,8 +45,17 @@ export const ActiveColumnTh = styled.th`
   }
 `;
 
-export const NickNameColumnTh = styled.th`
-  width: 20%!important;
+export const ValidateColumnTh = styled.th`
+  width: 13%!important;
+  text-align: left;
+
+  @media(max-width: 414px) {
+    display: none;
+  }
+`;
+
+export const ActiveColumnTh = styled.th`
+  width: 12%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -75,29 +74,25 @@ export const ActionColumnTh = styled.th`
 `;
 
 export const AvatarColumnTd = styled.td`
-  width: 10%!important;
+  width: 5%!important;
   text-align: center;
-  border: none;
 
   @media(max-width: 414px) {
     display: none;
   }
 `;
 
-export const NameColumnTd = styled.td`
-  width: 25%!important;
+export const TitleColumnTd = styled.td`
+  width: 20%!important;
   text-align: left;
 
   @media(max-width: 414px) {
     width: 50%!important;
     font-size: 12px;
-
-    border-radius: 5px 0 0 5px!important;
-    -webkit-border-radius: 5px 0 0 5px!important;
   }
 `;
 
-export const EmailColumnTd = styled.td`
+export const SubtitleColumnTd = styled.td`
   width: 25%!important;
   text-align: left;
 
@@ -106,8 +101,17 @@ export const EmailColumnTd = styled.td`
   }
 `;
 
-export const NickNameColumnTd = styled.td`
-  width: 20%!important;
+export const NfcColumnTd = styled.td`
+  width: 10%!important;
+  text-align: left;
+
+  @media(max-width: 414px) {
+    display: none;
+  }
+`;
+
+export const ValidateColumnTd = styled.td`
+  width: 13%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -116,7 +120,7 @@ export const NickNameColumnTd = styled.td`
 `;
 
 export const ActiveColumnTd = styled.td`
-  width: 5%!important;
+  width: 12%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -139,7 +143,7 @@ export const ActionColumnTd = styled.td`
   }
 `;
 
-export const TableButton = styled.button<ITableButtonProps>`
+export const TableButton = styled.button`
   display: flex;
   flex: 1;
   justify-content: center;
@@ -159,17 +163,6 @@ export const TableButton = styled.button<ITableButtonProps>`
   text-align: center;
 
   padding: 10px;
-
-  ${props => props.isInactive && css`
-    background: #DF4401;
-    border-color: #DF4401;
-  `}
-
-  @media(max-width: 414px) {
-    ${props => !props.isInactive && css`
-      display: none;
-    `}
-  }
 `;
 
 export const ContainerLoading = styled.div`

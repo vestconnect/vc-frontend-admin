@@ -6,66 +6,70 @@ import React, {
 import { useHistory } from 'react-router-dom';
 
 import { FormHandles } from '@unform/core';
-import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import {
-    FiMail,
-    FiLock
+    FiMail
 } from 'react-icons/fi';
 import * as Yup from 'yup';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
 
 import {
     Container,
-    ContainerLogin,
+    ContainerForgot,
     Background,
     Logo,
     Title,
     SubTitle,
     Powered,
     Form,
-    Forgot
+    Login
 } from './styles';
 
-interface LoginFormData {
+interface ForgotFormData {
     email: string;
     password: string;
 }
 
-const Login: React.FC = () => {
+const Forgot: React.FC = () => {
     const formRef = useRef<FormHandles>(null);
-    const { signIn } = useAuth();
     const { addToast } = useToast();
-    const [login, setLogin] = useState(false);
+    const [loading, setLoading] = useState(false);
     const history = useHistory();
 
-    const handleSubmit = useCallback(async (data: LoginFormData) => {
+    const handleSubmit = useCallback(async (data: ForgotFormData) => {
         try {
             formRef.current?.setErrors({});
 
             const schema = Yup.object().shape({
                 email: Yup.string().required('E-mail obrigatório').email('Digite um e-mail válido'),
-                password: Yup.string().required('Senha obrigatória')
             });
 
             await schema.validate(data, {
                 abortEarly: false
             });
 
-            setLogin(true);
+            setLoading(true);
 
-            await signIn({
-                email: data.email,
-                password: data.password
+            await api.post('/password/forgot', {
+                email: data.email
             });
 
-            setLogin(false);
+            addToast({
+                type: 'success',
+                title: 'E-mail enviado',
+                description: 'Verifique sua caixa de e-mail'
+            });
 
-            history.push('/home');
+            setLoading(false);
+
+            setTimeout(() => {
+                history.push('/');
+            }, 1500);
         } catch (e) {
-            setLogin(false);
+            setLoading(false);
 
             if (e instanceof Yup.ValidationError) {
                 const errors = getValidationErrors(e);
@@ -77,36 +81,35 @@ const Login: React.FC = () => {
 
             addToast({
                 type: 'error',
-                title: 'Erro ao fazer login',
-                description: 'Ocorreu um erro ao fazer login. Tente novamente.'
+                title: 'Erro ao enviar e-mail',
+                description: 'Ocorreu um erro ao enviar seu e-mail. Tente novamente.'
             });
         }
-    }, [addToast, history, setLogin, signIn]);
+    }, [addToast, setLoading, history]);
 
     return (
         <Container>
-            <ContainerLogin>
+            <ContainerForgot>
                 <Form ref={formRef} onSubmit={handleSubmit}>
                     <Logo />
 
-                    <SubTitle>Por favor, informe suas credenciais</SubTitle>
+                    <SubTitle>Por favor, informe seu e-mail para redefinir sua senha</SubTitle>
 
                     <Input name="email" icon={FiMail} placeholder="E-mail" />
-                    <Input name="password" type="password" icon={FiLock} placeholder="Senha" />
 
                     <Button
                         type="submit"
-                        disabled={login}
-                        loading={login}
+                        disabled={loading}
+                        loading={loading}
                     >
-                        Entrar
+                        Enviar e-mail
                     </Button>
 
-                    <Forgot to="/forgot">Esqueceu sua senha?</Forgot>
+                    <Login to="/">Voltar para o login</Login>
                 </Form>
 
                 <Powered>Powered by VestConnect@{new Date().getFullYear()}</Powered>
-            </ContainerLogin>
+            </ContainerForgot>
             <Background>
                 <Title>VestConnect</Title>
                 <SubTitle>Um novo modelo de interatividade</SubTitle>
@@ -115,4 +118,4 @@ const Login: React.FC = () => {
     )
 }
 
-export default Login;
+export default Forgot;

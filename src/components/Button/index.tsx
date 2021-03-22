@@ -1,12 +1,18 @@
 import React, { ButtonHTMLAttributes } from 'react';
+import Loading from '../Loading';
+import {
+    Container
+} from './styles';
 
-import { Container } from './styles';
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    loading?: boolean;
+    className?: string;
+    isTransparent?: boolean;
+}
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
-
-const Button: React.FC<ButtonProps> = ({ children, ...rest }) => (
-    <Container type="button" {...rest}>
-        {children}
+const Button: React.FC<ButtonProps> = ({ isTransparent, className, loading, children, ...rest }) => (
+    <Container type="button" {...rest} className={className} isTransparent={isTransparent}>
+        {loading ? <Loading /> : children}
     </Container>
 );
 

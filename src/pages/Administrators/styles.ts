@@ -1,34 +1,11 @@
 import styled, { css } from 'styled-components';
-import Button from '../../components/Button';
 
 interface ITableButtonProps {
   isInactive?: boolean;
 }
 
-export const ButtonProvider = styled(Button)`
-  max-width: 250px;
-  margin-top: 10px;
-`;
-
-export const Avatar = styled.img`
-    width: 80px;
-    height: 80px;
-    border-radius: 5px;
-    background-position: center;
-    background-size: contain;
-`;
-
-export const AvatarColumnTh = styled.th`
-  width: 10%!important;
-  text-align: center;
-
-  @media(max-width: 414px) {
-    display: none;
-  }
-`;
-
 export const NameColumnTh = styled.th`
-  width: 25%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -38,7 +15,7 @@ export const NameColumnTh = styled.th`
 `;
 
 export const EmailColumnTh = styled.th`
-  width: 20%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -47,16 +24,7 @@ export const EmailColumnTh = styled.th`
 `;
 
 export const ActiveColumnTh = styled.th`
-  width: 10%!important;
-  text-align: left;
-
-  @media(max-width: 414px) {
-    display: none;
-  }
-`;
-
-export const NickNameColumnTh = styled.th`
-  width: 20%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -65,7 +33,7 @@ export const NickNameColumnTh = styled.th`
 `;
 
 export const ActionColumnTh = styled.th`
-  width: 15%!important;
+  width: 10%!important;
   text-align: center!important;
 
   @media(max-width: 414px) {
@@ -74,18 +42,8 @@ export const ActionColumnTh = styled.th`
   }
 `;
 
-export const AvatarColumnTd = styled.td`
-  width: 10%!important;
-  text-align: center;
-  border: none;
-
-  @media(max-width: 414px) {
-    display: none;
-  }
-`;
-
 export const NameColumnTd = styled.td`
-  width: 25%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -98,16 +56,7 @@ export const NameColumnTd = styled.td`
 `;
 
 export const EmailColumnTd = styled.td`
-  width: 25%!important;
-  text-align: left;
-
-  @media(max-width: 414px) {
-    display: none;
-  }
-`;
-
-export const NickNameColumnTd = styled.td`
-  width: 20%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -116,7 +65,7 @@ export const NickNameColumnTd = styled.td`
 `;
 
 export const ActiveColumnTd = styled.td`
-  width: 5%!important;
+  width: 30%!important;
   text-align: left;
 
   @media(max-width: 414px) {
@@ -125,7 +74,7 @@ export const ActiveColumnTd = styled.td`
 `;
 
 export const ActionColumnTd = styled.td`
-  width: 15%!important;
+  width: 10%!important;
   text-align: center!important;
 
   div {
@@ -169,26 +118,5 @@ export const TableButton = styled.button<ITableButtonProps>`
     ${props => !props.isInactive && css`
       display: none;
     `}
-  }
-`;
-
-export const ContainerLoading = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  
-  align-items: center;
-  justify-content: center;
-
-  & > div {
-    margin-bottom: 10px;
-  }
-
-  & > span {
-    text-align: center;
-
-    @media(max-width: 414px) {
-      font-size: 12px;
-    }
   }
 `;
