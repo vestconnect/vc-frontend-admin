@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Pagination from '../../components/Pagination';
+import Loading from '../../components/Loading';
+import noRecords from '../../assets/icons/noRecords.png';
 import api from '../../services/api';
 import {
   FiUser,
@@ -23,7 +25,8 @@ import {
   NameColumnTd,
   EmailColumnTd,
   BirthColumnTd,
-  ActiveColumnTd
+  ActiveColumnTd,
+  ContainerLoading
 } from './styles';
 
 interface IUsers {
@@ -42,6 +45,7 @@ interface IResponse {
 }
 
 const Providers: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<IUsers[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -51,6 +55,7 @@ const Providers: React.FC = () => {
 
     setUsers(response.data.users);
     setTotalPages(response.data.total_pages);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -59,31 +64,47 @@ const Providers: React.FC = () => {
 
   return (
     <Page header="USUÁRIOS">
-      <Table>
-        <thead>
-          <tr>
-            <AvatarColumnTh></AvatarColumnTh>
-            <NameColumnTh>Nome</NameColumnTh>
-            <EmailColumnTh>E-mail</EmailColumnTh>
-            <BirthColumnTh>Data de nascimento</BirthColumnTh>
-            <ActiveColumnTh>Status</ActiveColumnTh>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => {
-            return (
-              <tr key={user.id}>
-                <AvatarColumnTd><Avatar src={user.avatar_url} /></AvatarColumnTd>
-                <NameColumnTd><div><FiUser size={20} />{user.name}</div></NameColumnTd>
-                <EmailColumnTd><div><FiMail size={20} />{user.email}</div></EmailColumnTd>
-                <BirthColumnTd><div><FiCalendar size={20} />{user.birth_user}</div></BirthColumnTd>
-                <ActiveColumnTd><div>{user.confirm_email ? <FiCheckCircle color="#00CC00" size={20} /> : <FiAlertCircle color="#DF4401" size={25} />}{user.confirm_email ? 'Ativo' : 'E-mail não confirmado'}</div></ActiveColumnTd>
-              </tr>
-            )
-          })}
-        </tbody>
-      </Table>
-      <Pagination totalPages={totalPages} setCurrentPage={setCurrentPage} />
+      {loading
+        ?
+        <ContainerLoading>
+          <Loading color="white" />
+          <span>Carregando usuários...</span>
+        </ContainerLoading>
+        : !users.length
+          ?
+          <ContainerLoading>
+            <img src={noRecords} alt="No records" width={60} height={60} style={{ marginBottom: 10 }} />
+            <span style={{ marginBottom: 0 }}>Nenhum usuário cadastrado</span>
+          </ContainerLoading>
+          :
+          <>
+            <Table>
+              <thead>
+                <tr>
+                  <AvatarColumnTh></AvatarColumnTh>
+                  <NameColumnTh>Nome</NameColumnTh>
+                  <EmailColumnTh>E-mail</EmailColumnTh>
+                  <BirthColumnTh>Data de nascimento</BirthColumnTh>
+                  <ActiveColumnTh>Status</ActiveColumnTh>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => {
+                  return (
+                    <tr key={user.id}>
+                      <AvatarColumnTd><Avatar src={user.avatar_url} /></AvatarColumnTd>
+                      <NameColumnTd><div><FiUser size={20} />{user.name}</div></NameColumnTd>
+                      <EmailColumnTd><div><FiMail size={20} />{user.email}</div></EmailColumnTd>
+                      <BirthColumnTd><div><FiCalendar size={20} />{user.birth_user}</div></BirthColumnTd>
+                      <ActiveColumnTd><div>{user.confirm_email ? <FiCheckCircle color="#00CC00" size={20} /> : <FiAlertCircle color="#DF4401" size={25} />}{user.confirm_email ? 'Ativo' : 'E-mail não confirmado'}</div></ActiveColumnTd>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </Table>
+            <Pagination totalPages={totalPages} setCurrentPage={setCurrentPage} />
+          </>
+      }
     </Page>
   );
 }

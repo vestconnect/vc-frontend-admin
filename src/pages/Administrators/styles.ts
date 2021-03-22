@@ -120,3 +120,24 @@ export const TableButton = styled.button<ITableButtonProps>`
     `}
   }
 `;
+
+export const ContainerLoading = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  
+  align-items: center;
+  justify-content: center;
+
+  & > div {
+    margin-bottom: 10px;
+  }
+
+  & > span {
+    text-align: center;
+
+    @media(max-width: 414px) {
+      font-size: 12px;
+    }
+  }
+`;

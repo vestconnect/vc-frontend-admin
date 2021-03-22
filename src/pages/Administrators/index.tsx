@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Page from '../../components/Page';
 import Table from '../../components/Table';
 import Pagination from '../../components/Pagination';
+import noRecords from '../../assets/icons/noRecords.png';
+import Loading from '../../components/Loading';
 import api from '../../services/api';
 import { useToast } from '../../hooks/toast';
 import {
@@ -21,7 +23,8 @@ import {
   EmailColumnTd,
   ActiveColumnTd,
   ActionColumnTd,
-  TableButton
+  TableButton,
+  ContainerLoading
 } from './styles';
 
 interface IUsers {
@@ -38,6 +41,7 @@ interface IResponse {
 }
 
 const Users: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<IUsers[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -48,6 +52,7 @@ const Users: React.FC = () => {
 
     setUsers(response.data.users);
     setTotalPages(response.data.total_pages);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -58,12 +63,12 @@ const Users: React.FC = () => {
     try {
       await api.patch(`users/${id}/active`);
 
-      const indexListProvider = users.findIndex(provider => {
+      const indexListUser = users.findIndex(provider => {
         return provider.id === id;
       });
 
-      if (indexListProvider !== -1) {
-        users[indexListProvider] = { ...users[indexListProvider], active: !users[indexListProvider].active }
+      if (indexListUser !== -1) {
+        users[indexListUser] = { ...users[indexListUser], active: !users[indexListUser].active }
 
         setUsers([...users]);
       }
@@ -84,55 +89,72 @@ const Users: React.FC = () => {
 
   return (
     <Page header="ADMINISTRADORES">
-      <Table>
-        <thead>
-          <tr>
-            <NameColumnTh>Nome</NameColumnTh>
-            <EmailColumnTh>E-mail</EmailColumnTh>
-            <ActiveColumnTh>Status</ActiveColumnTh>
-            <ActionColumnTh>Ações</ActionColumnTh>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => {
-            return (
-              <tr key={user.id}>
-                <NameColumnTd><div><FiUser size={20} />{user.name}</div></NameColumnTd>
-                <EmailColumnTd><div><FiMail size={20} />{user.email}</div></EmailColumnTd>
-                <ActiveColumnTd>
-                  <div>
-                    {user.active
-                      ? <FiCheckCircle color="#00CC00" size={20} />
-                      : <FiAlertCircle color="#DF4401" size={25} />}
-                    {user.active
-                      ? 'Ativo'
-                      : 'Inativo'}
-                  </div>
-                </ActiveColumnTd>
-                <ActionColumnTd>
-                  <div>
-                    <TableButton
-                      isInactive={true}
-                      onClick={() => {
-                        handleInactiveProvider(user.id)
-                      }}
-                    >
-                      {user.active
-                        ? <FiAlertCircle color="yellow" size={15} />
-                        : <FiCheckCircle color="#00CC00" size={15} />}
-                      {user.active
-                        ? 'Inativar'
-                        : 'Ativar'}
-                    </TableButton>
-                  </div>
+      {
+        loading
+          ?
+          <ContainerLoading>
+            <Loading color="white" />
+            <span>Carregando administradores...</span>
+          </ContainerLoading>
+          : !users.length
+            ?
+            <ContainerLoading>
+              <img src={noRecords} alt="No records" width={60} height={60} style={{ marginBottom: 10 }} />
+              <span style={{ marginBottom: 0 }}>Nenhum administrador cadastrado</span>
+            </ContainerLoading>
+            :
+            <>
+              <Table>
+                <thead>
+                  <tr>
+                    <NameColumnTh>Nome</NameColumnTh>
+                    <EmailColumnTh>E-mail</EmailColumnTh>
+                    <ActiveColumnTh>Status</ActiveColumnTh>
+                    <ActionColumnTh>Ações</ActionColumnTh>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(user => {
+                    return (
+                      <tr key={user.id}>
+                        <NameColumnTd><div><FiUser size={20} />{user.name}</div></NameColumnTd>
+                        <EmailColumnTd><div><FiMail size={20} />{user.email}</div></EmailColumnTd>
+                        <ActiveColumnTd>
+                          <div>
+                            {user.active
+                              ? <FiCheckCircle color="#00CC00" size={20} />
+                              : <FiAlertCircle color="#DF4401" size={25} />}
+                            {user.active
+                              ? 'Ativo'
+                              : 'Inativo'}
+                          </div>
+                        </ActiveColumnTd>
+                        <ActionColumnTd>
+                          <div>
+                            <TableButton
+                              isInactive={true}
+                              onClick={() => {
+                                handleInactiveProvider(user.id)
+                              }}
+                            >
+                              {user.active
+                                ? <FiAlertCircle color="yellow" size={15} />
+                                : <FiCheckCircle color="#00CC00" size={15} />}
+                              {user.active
+                                ? 'Inativar'
+                                : 'Ativar'}
+                            </TableButton>
+                          </div>
 
-                </ActionColumnTd>
-              </tr>
-            )
-          })}
-        </tbody>
-      </Table>
-      <Pagination totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                        </ActionColumnTd>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </Table>
+              <Pagination totalPages={totalPages} setCurrentPage={setCurrentPage} />
+            </>
+      }
     </Page>
   );
 }
